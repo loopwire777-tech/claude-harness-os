@@ -1,0 +1,16 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Card {
+  id        String   @id @default(cuid())
+  title     String
+  columnId  String
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
