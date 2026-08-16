@@ -1,0 +1,30 @@
+{
+  "name": "task-board",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*",
+    "e2e"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace apps/web & npm run dev --workspace services/api",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "vitest run",
+    "test:e2e": "npm run test --workspace e2e",
+    "db:reset": "npm run db:reset --workspace services/api"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  },
+  "allowScripts": {
+    "@prisma/client@5.22.0": true,
+    "@prisma/engines@5.22.0": true,
+    "prisma@5.22.0": true,
+    "esbuild@0.21.5": true,
+    "esbuild@0.28.2": true,
+    "fsevents@2.3.2": true,
+    "fsevents@2.3.3": true
+  }
+}
