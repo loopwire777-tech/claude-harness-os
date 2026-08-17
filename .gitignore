@@ -4,3 +4,5 @@ dist/
 *.db
 *.db-journal
 services/api/prisma/dev.db
+.claude/settings.local.json
+.claude/instructions-loaded.log
