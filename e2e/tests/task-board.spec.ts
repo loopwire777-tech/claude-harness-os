@@ -11,6 +11,10 @@ test("create a card, move it, and mark it complete", async ({ page }) => {
   const card = page.getByTestId("card").filter({ hasText: title });
   await expect(card).toBeVisible();
 
+  const createdAt = card.getByTestId("card-created-at");
+  await expect(createdAt).toBeVisible();
+  await expect(createdAt).toHaveText("just now");
+
   await card.getByRole("combobox").selectOption("in-progress");
   await expect(card).toBeVisible();
 

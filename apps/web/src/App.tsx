@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import type { Card, ColumnId } from "@task-board/shared";
 import { fetchCards, createCard, moveCard, completeCard } from "./api";
+import { formatRelativeTime } from "./relativeTime";
+import "./App.css";
 
 const COLUMNS: { id: ColumnId; label: string }[] = [
   { id: "todo", label: "To Do" },
@@ -35,9 +37,9 @@ export function App() {
   }
 
   return (
-    <div>
+    <div className="board">
       <h1>Task Board</h1>
-      <form onSubmit={handleCreate}>
+      <form className="new-card-form" onSubmit={handleCreate}>
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -45,17 +47,20 @@ export function App() {
         />
         <button type="submit">Add card</button>
       </form>
-      <div style={{ display: "flex", gap: "1rem" }}>
+      <div className="columns">
         {COLUMNS.map((column) => (
-          <div key={column.id} style={{ flex: 1 }}>
+          <div key={column.id} className="column">
             <h2>{column.label}</h2>
             {cards
               .filter((c) => c.columnId === column.id)
               .map((card) => (
-                <div key={card.id} data-testid="card">
-                  <span style={{ textDecoration: card.completed ? "line-through" : "none" }}>
+                <div key={card.id} className="card" data-testid="card">
+                  <span className={`card-title${card.completed ? " completed" : ""}`}>
                     {card.title}
                   </span>
+                  <time className="card-time" dateTime={card.createdAt} data-testid="card-created-at">
+                    {formatRelativeTime(card.createdAt)}
+                  </time>
                   <select
                     value={card.columnId}
                     onChange={(e) => handleMove(card.id, e.target.value as ColumnId)}
