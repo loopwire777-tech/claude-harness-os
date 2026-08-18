@@ -85,7 +85,7 @@ body {
 
 .card {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 8px;
   background: #fff;
   border-radius: 6px;
@@ -95,8 +95,6 @@ body {
 }
 
 .card-title {
-  flex: 1;
-  min-width: 0;
   font-size: 14px;
   line-height: 1.4;
   overflow-wrap: break-word;
@@ -105,6 +103,13 @@ body {
 .card-title.completed {
   text-decoration: line-through;
   color: #97a0af;
+}
+
+.card-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .card-time {
@@ -136,4 +141,13 @@ body {
 
 .card button:hover {
   background: #abf5d1;
+}
+
+.card button.delete-btn {
+  background: #ffebe6;
+  color: #bf2600;
+}
+
+.card button.delete-btn:hover {
+  background: #ffbdad;
 }

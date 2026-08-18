@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Card, ColumnId } from "@task-board/shared";
-import { fetchCards, createCard, moveCard, completeCard } from "./api";
+import { fetchCards, createCard, moveCard, completeCard, deleteCard } from "./api";
 import { formatRelativeTime } from "./relativeTime";
 import "./App.css";
 
@@ -36,6 +36,11 @@ export function App() {
     setCards((prev) => prev.map((c) => (c.id === id ? card : c)));
   }
 
+  async function handleDelete(id: string) {
+    await deleteCard(id);
+    setCards((prev) => prev.filter((c) => c.id !== id));
+  }
+
   return (
     <div className="board">
       <h1>Task Board</h1>
@@ -58,22 +63,31 @@ export function App() {
                   <span className={`card-title${card.completed ? " completed" : ""}`}>
                     {card.title}
                   </span>
-                  <time className="card-time" dateTime={card.createdAt} data-testid="card-created-at">
-                    {formatRelativeTime(card.createdAt)}
-                  </time>
-                  <select
-                    value={card.columnId}
-                    onChange={(e) => handleMove(card.id, e.target.value as ColumnId)}
-                  >
-                    {COLUMNS.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.label}
-                      </option>
-                    ))}
-                  </select>
-                  {!card.completed && (
-                    <button onClick={() => handleComplete(card.id)}>Complete</button>
-                  )}
+                  <div className="card-controls">
+                    <time className="card-time" dateTime={card.createdAt} data-testid="card-created-at">
+                      {formatRelativeTime(card.createdAt)}
+                    </time>
+                    <select
+                      value={card.columnId}
+                      onChange={(e) => handleMove(card.id, e.target.value as ColumnId)}
+                    >
+                      {COLUMNS.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.label}
+                        </option>
+                      ))}
+                    </select>
+                    {!card.completed && (
+                      <button onClick={() => handleComplete(card.id)}>Complete</button>
+                    )}
+                    <button
+                      className="delete-btn"
+                      aria-label={`Delete ${card.title}`}
+                      onClick={() => handleDelete(card.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               ))}
           </div>

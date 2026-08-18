@@ -1,5 +1,5 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { CreateCardInput, MoveCardInput } from "@task-board/shared";
 
 const prisma = new PrismaClient();
@@ -38,6 +38,18 @@ app.patch("/cards/:id/complete", async (req, res) => {
     data: { completed: true },
   });
   res.json(card);
+});
+
+app.delete("/cards/:id", async (req, res) => {
+  try {
+    await prisma.card.delete({ where: { id: req.params.id } });
+    res.status(204).end();
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2025") {
+      return res.status(404).json({ error: "card not found" });
+    }
+    throw err;
+  }
 });
 
 const port = process.env.PORT ?? 3001;

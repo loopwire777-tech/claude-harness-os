@@ -29,3 +29,7 @@ export async function completeCard(id: string): Promise<Card> {
   const res = await fetch(`${base}/cards/${id}/complete`, { method: "PATCH" });
   return res.json();
 }
+
+export async function deleteCard(id: string): Promise<void> {
+  await fetch(`${base}/cards/${id}`, { method: "DELETE" });
+}
