@@ -1,5 +1,5 @@
 ---
-description: Use when asked to review a diff, PR, or set of changes in task-board for correctness and quality before merge. Defines review order and severity classification. Not for reviewing your own work as you write it (that's just careful implementation) or for the /code-review slash command's automated multi-agent flow - use this for a manual/directed review pass.
+description: Use when asked to review a diff, PR, or set of changes in task-board for correctness and quality before merge. Defines review order and severity classification. Not for reviewing your own work as you write it (that's just careful implementation). For a heavier review, invoke the code-reviewer, security-reviewer, performance-reviewer, and test-engineer agents directly, one at a time, in the same session - there is no automated multi-agent fan-out in this repo.
 ---
 
 # Code Review
