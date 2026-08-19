@@ -1,6 +1,6 @@
 import express from "express";
 import { Prisma, PrismaClient } from "@prisma/client";
-import { CreateCardInput, MoveCardInput } from "@task-board/shared";
+import { CreateCardInput, IdParam, MoveCardInput } from "@task-board/shared";
 
 const prisma = new PrismaClient();
 const app = express();
@@ -21,28 +21,40 @@ app.post("/cards", async (req, res) => {
 });
 
 app.patch("/cards/:id/move", async (req, res) => {
+  const parsedId = IdParam.safeParse(req.params);
+  if (!parsedId.success) {
+    return res.status(400).json({ error: parsedId.error.flatten() });
+  }
   const parsed = MoveCardInput.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: parsed.error.flatten() });
   }
   const card = await prisma.card.update({
-    where: { id: req.params.id },
+    where: { id: parsedId.data.id },
     data: { columnId: parsed.data.columnId },
   });
   res.json(card);
 });
 
 app.patch("/cards/:id/complete", async (req, res) => {
+  const parsedId = IdParam.safeParse(req.params);
+  if (!parsedId.success) {
+    return res.status(400).json({ error: parsedId.error.flatten() });
+  }
   const card = await prisma.card.update({
-    where: { id: req.params.id },
+    where: { id: parsedId.data.id },
     data: { completed: true },
   });
   res.json(card);
 });
 
 app.delete("/cards/:id", async (req, res) => {
+  const parsedId = IdParam.safeParse(req.params);
+  if (!parsedId.success) {
+    return res.status(400).json({ error: parsedId.error.flatten() });
+  }
   try {
-    await prisma.card.delete({ where: { id: req.params.id } });
+    await prisma.card.delete({ where: { id: parsedId.data.id } });
     res.status(204).end();
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2025") {
