@@ -44,11 +44,18 @@ app.patch(
     if (!parsed.success) {
       return res.status(400).json({ error: parsed.error.flatten() });
     }
-    const card = await prisma.card.update({
-      where: { id: parsedId.data.id },
-      data: { columnId: parsed.data.columnId },
-    });
-    res.json(card);
+    try {
+      const card = await prisma.card.update({
+        where: { id: parsedId.data.id },
+        data: { columnId: parsed.data.columnId },
+      });
+      res.json(card);
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2025") {
+        return res.status(404).json({ error: "card not found" });
+      }
+      throw err;
+    }
   })
 );
 
@@ -59,11 +66,18 @@ app.patch(
     if (!parsedId.success) {
       return res.status(400).json({ error: parsedId.error.flatten() });
     }
-    const card = await prisma.card.update({
-      where: { id: parsedId.data.id },
-      data: { completed: true },
-    });
-    res.json(card);
+    try {
+      const card = await prisma.card.update({
+        where: { id: parsedId.data.id },
+        data: { completed: true },
+      });
+      res.json(card);
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2025") {
+        return res.status(404).json({ error: "card not found" });
+      }
+      throw err;
+    }
   })
 );
 
