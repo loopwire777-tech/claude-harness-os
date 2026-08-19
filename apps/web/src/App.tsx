@@ -28,13 +28,23 @@ export function App() {
   }
 
   async function handleMove(id: string, columnId: ColumnId) {
-    const card = await moveCard(id, columnId);
-    setCards((prev) => prev.map((c) => (c.id === id ? card : c)));
+    try {
+      const card = await moveCard(id, columnId);
+      setCards((prev) => prev.map((c) => (c.id === id ? card : c)));
+      setError(null);
+    } catch {
+      setError("Failed to move card. Please try again.");
+    }
   }
 
   async function handleComplete(id: string) {
-    const card = await completeCard(id);
-    setCards((prev) => prev.map((c) => (c.id === id ? card : c)));
+    try {
+      const card = await completeCard(id);
+      setCards((prev) => prev.map((c) => (c.id === id ? card : c)));
+      setError(null);
+    } catch {
+      setError("Failed to complete card. Please try again.");
+    }
   }
 
   async function handleDelete(id: string) {
