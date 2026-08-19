@@ -13,6 +13,7 @@ const COLUMNS: { id: ColumnId; label: string }[] = [
 export function App() {
   const [cards, setCards] = useState<Card[]>([]);
   const [title, setTitle] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCards().then(setCards);
@@ -37,13 +38,23 @@ export function App() {
   }
 
   async function handleDelete(id: string) {
-    await deleteCard(id);
-    setCards((prev) => prev.filter((c) => c.id !== id));
+    try {
+      await deleteCard(id);
+      setCards((prev) => prev.filter((c) => c.id !== id));
+      setError(null);
+    } catch {
+      setError("Failed to delete card. Please try again.");
+    }
   }
 
   return (
     <div className="board">
       <h1>Task Board</h1>
+      {error && (
+        <p className="error-message" role="alert">
+          {error}
+        </p>
+      )}
       <form className="new-card-form" onSubmit={handleCreate}>
         <input
           value={title}

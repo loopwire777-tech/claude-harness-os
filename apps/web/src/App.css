@@ -23,6 +23,15 @@ body {
   color: #172b4d;
 }
 
+.error-message {
+  font-size: 14px;
+  color: #bf2600;
+  background: #ffebe6;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin: 0 0 16px;
+}
+
 .new-card-form {
   display: flex;
   gap: 8px;

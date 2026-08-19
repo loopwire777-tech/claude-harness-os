@@ -36,3 +36,34 @@ test("create a card and delete it", async ({ page }) => {
   await card.getByRole("button", { name: `Delete ${title}` }).click();
   await expect(card).not.toBeVisible();
 });
+
+test("card stays visible and shows an error when delete fails", async ({ page, context }) => {
+  const title = `Keep me ${Date.now()}`;
+
+  await page.goto("/");
+
+  await page.getByPlaceholder("New card title").fill(title);
+  await page.getByRole("button", { name: "Add card" }).click();
+
+  const card = page.getByTestId("card").filter({ hasText: title });
+  await expect(card).toBeVisible();
+
+  // A second tab loads the same card into its own React state. Deleting it from
+  // the first tab removes it from the real DB; the second tab's stale reference
+  // then produces a genuine 404 from the API when it tries to delete it too -
+  // no mocked network responses, just two clients racing the real server.
+  const staleTab = await context.newPage();
+  await staleTab.goto("/");
+  const staleCard = staleTab.getByTestId("card").filter({ hasText: title });
+  await expect(staleCard).toBeVisible();
+
+  await card.getByRole("button", { name: `Delete ${title}` }).click();
+  await expect(card).not.toBeVisible();
+
+  await staleCard.getByRole("button", { name: `Delete ${title}` }).click();
+
+  await expect(staleCard).toBeVisible();
+  await expect(staleTab.getByRole("alert")).toHaveText("Failed to delete card. Please try again.");
+
+  await staleTab.close();
+});
