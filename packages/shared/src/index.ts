@@ -22,3 +22,8 @@ export const MoveCardInput = z.object({
   columnId: ColumnId,
 });
 export type MoveCardInput = z.infer<typeof MoveCardInput>;
+
+export const IdParam = z.object({
+  id: z.string().min(1).max(50),
+});
+export type IdParam = z.infer<typeof IdParam>;
