@@ -67,3 +67,68 @@ test("card stays visible and shows an error when delete fails", async ({ page, c
 
   await staleTab.close();
 });
+
+test("card stays visible and shows an error when move fails on a deleted card", async ({
+  page,
+  context,
+}) => {
+  const title = `Move me ${Date.now()}`;
+
+  await page.goto("/");
+
+  await page.getByPlaceholder("New card title").fill(title);
+  await page.getByRole("button", { name: "Add card" }).click();
+
+  const card = page.getByTestId("card").filter({ hasText: title });
+  await expect(card).toBeVisible();
+
+  // Same real-race setup as the delete test above: a second tab holds a stale
+  // reference to a card the first tab deletes from the real DB, so the move
+  // request from the stale tab hits a genuine 404 - no mocked responses.
+  const staleTab = await context.newPage();
+  await staleTab.goto("/");
+  const staleCard = staleTab.getByTestId("card").filter({ hasText: title });
+  await expect(staleCard).toBeVisible();
+
+  await card.getByRole("button", { name: `Delete ${title}` }).click();
+  await expect(card).not.toBeVisible();
+
+  await staleCard.getByRole("combobox").selectOption("in-progress");
+
+  await expect(staleCard).toBeVisible();
+  await expect(staleTab.getByRole("alert")).toHaveText("Failed to move card. Please try again.");
+
+  await staleTab.close();
+});
+
+test("card stays visible and shows an error when complete fails on a deleted card", async ({
+  page,
+  context,
+}) => {
+  const title = `Complete me ${Date.now()}`;
+
+  await page.goto("/");
+
+  await page.getByPlaceholder("New card title").fill(title);
+  await page.getByRole("button", { name: "Add card" }).click();
+
+  const card = page.getByTestId("card").filter({ hasText: title });
+  await expect(card).toBeVisible();
+
+  const staleTab = await context.newPage();
+  await staleTab.goto("/");
+  const staleCard = staleTab.getByTestId("card").filter({ hasText: title });
+  await expect(staleCard).toBeVisible();
+
+  await card.getByRole("button", { name: `Delete ${title}` }).click();
+  await expect(card).not.toBeVisible();
+
+  await staleCard.getByRole("button", { name: "Complete", exact: true }).click();
+
+  await expect(staleCard).toBeVisible();
+  await expect(staleTab.getByRole("alert")).toHaveText(
+    "Failed to complete card. Please try again."
+  );
+
+  await staleTab.close();
+});

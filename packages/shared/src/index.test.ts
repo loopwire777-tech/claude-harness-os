@@ -25,6 +25,16 @@ describe("IdParam", () => {
     expect(result.success).toBe(true);
   });
 
+  it("accepts a 1-character id", () => {
+    const result = IdParam.safeParse({ id: "a" });
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts a 50-character id", () => {
+    const result = IdParam.safeParse({ id: "a".repeat(50) });
+    expect(result.success).toBe(true);
+  });
+
   it("rejects an empty id", () => {
     const result = IdParam.safeParse({ id: "" });
     expect(result.success).toBe(false);
