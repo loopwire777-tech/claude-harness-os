@@ -13,6 +13,18 @@ function asyncHandler(handler: RequestHandler): RequestHandler {
   };
 }
 
+async function runOrNotFound<T>(res: Response, op: () => Promise<T>): Promise<T | undefined> {
+  try {
+    return await op();
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2025") {
+      res.status(404).json({ error: "card not found" });
+      return undefined;
+    }
+    throw err;
+  }
+}
+
 app.get(
   "/cards",
   asyncHandler(async (_req, res) => {
@@ -44,18 +56,14 @@ app.patch(
     if (!parsed.success) {
       return res.status(400).json({ error: parsed.error.flatten() });
     }
-    try {
-      const card = await prisma.card.update({
+    const card = await runOrNotFound(res, () =>
+      prisma.card.update({
         where: { id: parsedId.data.id },
         data: { columnId: parsed.data.columnId },
-      });
-      res.json(card);
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2025") {
-        return res.status(404).json({ error: "card not found" });
-      }
-      throw err;
-    }
+      })
+    );
+    if (card === undefined) return;
+    res.json(card);
   })
 );
 
@@ -66,18 +74,14 @@ app.patch(
     if (!parsedId.success) {
       return res.status(400).json({ error: parsedId.error.flatten() });
     }
-    try {
-      const card = await prisma.card.update({
+    const card = await runOrNotFound(res, () =>
+      prisma.card.update({
         where: { id: parsedId.data.id },
         data: { completed: true },
-      });
-      res.json(card);
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2025") {
-        return res.status(404).json({ error: "card not found" });
-      }
-      throw err;
-    }
+      })
+    );
+    if (card === undefined) return;
+    res.json(card);
   })
 );
 
@@ -88,15 +92,11 @@ app.delete(
     if (!parsedId.success) {
       return res.status(400).json({ error: parsedId.error.flatten() });
     }
-    try {
-      await prisma.card.delete({ where: { id: parsedId.data.id } });
-      res.status(204).end();
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2025") {
-        return res.status(404).json({ error: "card not found" });
-      }
-      throw err;
-    }
+    const deleted = await runOrNotFound(res, () =>
+      prisma.card.delete({ where: { id: parsedId.data.id } })
+    );
+    if (deleted === undefined) return;
+    res.status(204).end();
   })
 );
 
