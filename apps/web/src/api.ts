@@ -31,5 +31,8 @@ export async function completeCard(id: string): Promise<Card> {
 }
 
 export async function deleteCard(id: string): Promise<void> {
-  await fetch(`${base}/cards/${id}`, { method: "DELETE" });
+  const res = await fetch(`${base}/cards/${id}`, { method: "DELETE" });
+  if (!res.ok) {
+    throw new Error(`Failed to delete card: ${res.status}`);
+  }
 }
