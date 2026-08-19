@@ -22,14 +22,23 @@ export async function moveCard(id: string, columnId: ColumnId): Promise<Card> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ columnId }),
   });
+  if (!res.ok) {
+    throw new Error(`Failed to move card: ${res.status}`);
+  }
   return res.json();
 }
 
 export async function completeCard(id: string): Promise<Card> {
   const res = await fetch(`${base}/cards/${id}/complete`, { method: "PATCH" });
+  if (!res.ok) {
+    throw new Error(`Failed to complete card: ${res.status}`);
+  }
   return res.json();
 }
 
 export async function deleteCard(id: string): Promise<void> {
-  await fetch(`${base}/cards/${id}`, { method: "DELETE" });
+  const res = await fetch(`${base}/cards/${id}`, { method: "DELETE" });
+  if (!res.ok) {
+    throw new Error(`Failed to delete card: ${res.status}`);
+  }
 }
